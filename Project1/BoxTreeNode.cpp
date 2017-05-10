@@ -262,8 +262,27 @@ bool BoxTreeNode::closestIntersect(const Ray & ray, Intersection & hit)
 		if (boxFirst && boxSecond)
 		{
 			Intersection hit1, hit2;
-			bool intersect1 = child1->closestIntersect(ray, hit1);
-			bool intersect2 = child2->closestIntersect(ray, hit2);
+			bool intersect1 = false, intersect2 = false;
+
+			if (bHit1.dist < bHit2.dist)
+			{
+				intersect1 = child1->closestIntersect(ray, hit1);
+
+				if (intersect1 == false || hit1.dist > bHit2.dist)
+				{
+					intersect2 = child2->closestIntersect(ray, hit2);
+				}
+			}
+			else
+			{
+				intersect2 = child2->closestIntersect(ray, hit2);
+
+				if (intersect2 == false || hit2.dist > bHit1.dist)
+				{
+					intersect1 = child1->closestIntersect(ray, hit1);
+				}
+			}
+
 			intersect = (intersect1 || intersect2);
 	
 			if (intersect1 && intersect2)

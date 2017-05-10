@@ -16,10 +16,13 @@
 #include "glm/gtx/euler_angles.hpp"
 #include "SphereObject.h"
 #include "BoxTreeObject.h"
+#include "LambertMaterial.h"
+#include "MetalMaterial.h"
 
 using namespace std;
 void project1();
 void project2();
+void project3();
 void spheres();
 void testProject();
 
@@ -27,10 +30,11 @@ void testProject();
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc,char **argv) {
-	//project1();	
-	project2();
+	project1();	
+	//project2();
 	//spheres();
 	//testProject();
+	//project3();
 	return 0;
 }
 
@@ -119,7 +123,11 @@ void project1() {
 	cam.lookAt(glm::vec3(2.0f,2.0f,5.0f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0,1,0));
 	cam.setResolution(800,600);
 	cam.setFOV(40.0f);
-	cam.setAspect(1.33f); 
+	cam.setAspect(1.33f);
+	cam.makeSuperSampler();
+	cam.setSuperSample(4, 4);
+	cam.setShirley(true);
+	cam.setJitter(true);
 
 	// Render image
 	cam.render(scn);
@@ -184,6 +192,61 @@ void project2() {
 	// Render image
 	cam.render(scn);
 	cam.saveBitmap("project2.bmp");
+}
+void project3() {
+	// Create scene
+	Scene scn;
+	scn.setSkyColor(Color(0.8f, 0.9f, 1.0f));
+	// Create ground
+	LambertMaterial groundMtl;
+	groundMtl.setColor(Color(0.25f, 0.25f, 0.25f));
+	MeshObject ground;
+	ground.makeBox(2.0f, 0.11f, 2.0f, &groundMtl);
+	scn.addObject(ground);
+	// Load dragon mesh
+	MeshObject dragon;
+	dragon.loadPLY("dragon.ply", 0);
+	// Create box tree
+	BoxTreeObject tree;
+	tree.construct(dragon);
+	// Materials
+	LambertMaterial white;
+	white.setColor(Color(0.7f, 0.7f, 0.7f));
+	LambertMaterial red;
+	red.setColor(Color(0.7f, 0.1f, 0.1f));
+	MetalMaterial metal;
+	metal.setColor(Color(0.95f, 0.64f, 0.54f));
+	const int numDragons = 4;
+	Material *mtl[numDragons] = { &white,&metal,&red,&white };
+	// Create dragon instances
+	glm::mat4 mtx;
+	for (int i = 0; i<numDragons; i++) {
+		InstanceObject * inst = new InstanceObject();
+		inst->setChild(tree);
+		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
+		inst->setMatrix(mtx);
+		inst->setMaterial(mtl[i]);
+		scn.addObject(*inst);
+	}
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.setBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.setIntensity(1.0f);
+	sunlgt.setDirection(glm::vec3(2.0f, -3.0f, -2.0f));
+	scn.addLight(sunlgt);
+	// Create camera
+	Camera cam;
+	cam.setResolution(640, 480);
+	cam.setAspect(1.33f);
+	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	cam.setFOV(40.0f);
+	cam.makeSuperSampler();
+	cam.setSuperSample(10, 10);
+	cam.setJitter(true);
+	cam.setShirley(true);
+	// Render image
+	cam.render(scn);
+	cam.saveBitmap("project3.bmp");
 }
 void testProject()
 {

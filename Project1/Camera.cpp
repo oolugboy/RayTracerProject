@@ -5,6 +5,10 @@
  Camera::Camera()
  {
 	 count = 0;
+	 superSampler = false;
+	 jitter = shirley = false;
+	 rayTracer = new RayTracer();
+	 srand(0);
  }
  void Camera::setFOV(float f)
  {
@@ -36,65 +40,107 @@
 	{
 		for (int x = 0; x < xRes; x++)
 		{
-			renderPixel(x, y, s);
+			if (superSampler)
+			{
+				superSamplePixel(x, y, s);
+			}
+			else
+			{
+				samplePixel(x, y, s);
+			}
 		}
 	}
  }
-
- void Camera::colorPixel(Ray ray, int x, int y, Scene & s)
+ void Camera::setSuperSample(float xSamples, float ySamples)
  {
-	 Intersection hit = Intersection();
-
-	// cout << " The camera calling closest intersect " << endl;
-	 bool collided = s.getClosestIntersect(ray, hit);
+	 this->xSamples = xSamples;
+	 this->ySamples = ySamples;
+ }
+ void Camera::setJitter(bool jitter)
+ {
+	 this->jitter = jitter;
+ }
+ void Camera::setShirley(bool shirley)
+ {
+	 this->shirley = shirley;
+ }
+ void Camera::samplePixel(int x, int y, Scene & s)
+ {
+	 /* First get the direction of the ray */
+	 float fx = (((float)x + 0.5f) / ((float)xRes)) - 0.5f;
+	 float fy = (((float)y + 0.5f) / ((float)yRes)) - 0.5f;
 
 	 Color pixelColor = Color(0.0f, 0.0f, 0.0f);
+	 shootAtPixelOffset(fx, fy, s, pixelColor);
 
-	 if (collided)
+	 /* Set the color of the pixel */
+	 bMP->SetPixel(x, y, pixelColor.ToInt());
+ }
+ void Camera::applyShirley(float & xRand, float & yRand)
+ {
+	 if (xRand < 0.5f)
 	 {
-		 vector < Color > colors(s.getNumLights());
-		 for (int i = 0; i < s.getNumLights(); i++)
-		 {
-			 glm::vec3 lightPos;
-			 glm::vec3 toLight;
-
-			 float intensity = s.getLight(i).illuminate(hit.position, colors[i], toLight, lightPos, hit.normal);
-			 colors[i].scale(intensity);
-			 Ray shadowRay;
-			 shadowRay.origin = hit.position;
-			 shadowRay.direction = glm::normalize(lightPos - hit.position);
-			 Intersection shadowHit;
-
-			if (s.shadows)
-			 {
-				 bool intercept = s.getClosestIntersect(shadowRay, shadowHit);
-				 if (intercept)
-				 {
-					//cout << " The hit dist is " << shadowHit.dist << " light dist " << glm::length(lightPos - hit.position) << endl;
-				 }
-				
-				 if (intercept == false || shadowHit.dist > glm::length(lightPos - hit.position))
-				 {
-					 pixelColor.add(colors[i]);
-				 }
-			 }
-			 else 
-				 pixelColor.add(colors[i]);			
-		 }
+		 xRand = -0.5f + sqrt(2.0f * xRand);
 	 }
 	 else
 	 {
-		 pixelColor = s.getSkyColor();
+		 xRand = 1.5f - sqrt(2.0f - (2.0f * xRand));
 	 }
-	 /* Set the color of the pixel */
-	 bMP->SetPixel(x, y, pixelColor.ToInt());	
+	 if (yRand < 0.5f)
+	 {
+		 yRand = -0.5f + sqrt(2.0f * yRand);
+	 }
+	 else
+	 {
+		 yRand = 1.5f - sqrt(2.0f - (2.0f * yRand));
+	 }
  }
- void Camera::renderPixel(int x, int y, Scene & s)
+ 
+ void Camera::superSamplePixel(int x, int y, Scene & s)
  {
-	 /* First get the direction of the ray */
-	 float fx = (((float)x + 0.5f)/ ((float)xRes)) - 0.5f;
-	 float fy = (((float)y + 0.5f) / ((float)yRes)) - 0.5f;
+	float baseFx = (float)x / (float)xRes, baseFy = (float)y / (float)yRes;
+	int count = 0;
+	Color pixelColor = Color(0.0f, 0.0f, 0.0f);
+	for (int yOff = 0; yOff < ySamples; yOff++)
+	{
+		for (int xOff = 0; xOff < xSamples; xOff++)
+		{
+			float fx = baseFx + ((float)xOff / (xRes * xSamples));
+			float fy = baseFy + ((float)yOff / (yRes * ySamples));
 
+			float xRand = 0.0f, yRand = 0.0f;
+			if (jitter)
+			{
+				xRand = (float)(rand() % 10) / 9.0f;
+				yRand = (float)(rand() % 10) / 9.0f;
+			}
+			if (shirley)
+			{
+				applyShirley(xRand, yRand);
+			}
+
+			fx += xRand / (xRes * xSamples);
+			fx -= 0.5f;
+			fy += yRand / (yRes * ySamples);
+			fy -= 0.5f;
+
+			
+			Color subPixelColor = Color(0.0f, 0.0f, 0.0f);
+			shootAtPixelOffset(fx, fy, s, subPixelColor);
+			pixelColor.scale(count);
+			pixelColor.add(subPixelColor);
+			pixelColor.scale(1.0f / (float)(count + 1));
+			count++;
+		}
+	}
+	bMP->SetPixel(x, y, pixelColor.ToInt());
+}
+ void Camera::makeSuperSampler()
+ {
+	 superSampler = true;
+ }
+ void Camera::shootAtPixelOffset(float fx, float fy, Scene & s, Color & pixelColor)
+ {
 	 float PI = 3.14159265;
 	 float radVFOV = (verticalFOV * PI) / 180.0f;
 	 float radHFOV = 2.0f * atan(aspect * tan(radVFOV / 2.0f));
@@ -112,8 +158,15 @@
 	 ray.origin = d;
 	 ray.direction = glm::normalize((fx * scaleX * a) + (fy * scaleY * b) - c);
 
-	 colorPixel(ray, x, y, s);
-
+	 if (superSampler)
+	 {
+		//Temp
+		 rayTracer->rayTrace(ray, s, pixelColor);
+	 }
+	 else
+	 {
+		 rayTracer->rayTrace(ray, s, pixelColor);
+	 }	
  }
  void Camera::saveBitmap(char * filename)
  {

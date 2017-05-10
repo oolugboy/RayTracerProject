@@ -18,6 +18,10 @@ bool InstanceObject::intersect(const Ray & ray, Intersection & hit)
 	hit.position = glm::vec3(matrix * glm::vec4(hit.position, 1));
 	hit.normal = glm::vec3(matrix * glm::vec4(hit.normal, 0));
 	hit.dist = glm::distance(ray.origin, hit.position); // Correct for any scaling
+	if (this->mtl)
+	{
+		hit.mtl = this->mtl;
+	}
 	return true;
 }
 bool InstanceObject::closestIntersect(const Ray & ray, Intersection & hit)
@@ -38,7 +42,15 @@ bool InstanceObject::closestIntersect(const Ray & ray, Intersection & hit)
 	hit.position = glm::vec3(matrix * glm::vec4(hit.position, 1));
 	hit.normal = glm::normalize(glm::vec3(matrix * glm::vec4(hit.normal, 0)));
 	hit.dist = glm::distance(ray.origin, hit.position); // Correct for any scaling
+	if (this->mtl)
+	{
+		hit.mtl = this->mtl;
+	}
 	return true;
+}
+void InstanceObject::setMaterial(Material * mtl)
+{
+	this->mtl = mtl;
 }
 void InstanceObject::setChild(Object &obj)
 {
