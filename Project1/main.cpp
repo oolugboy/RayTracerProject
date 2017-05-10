@@ -30,11 +30,11 @@ void testProject();
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc,char **argv) {
-	project1();	
+	//project1();	
 	//project2();
 	//spheres();
 	//testProject();
-	//project3();
+	project3();
 	return 0;
 }
 
@@ -124,7 +124,7 @@ void project1() {
 	cam.setResolution(800,600);
 	cam.setFOV(40.0f);
 	cam.setAspect(1.33f);
-	cam.makeSuperSampler();
+	//cam.makeSuperSampler();
 	cam.setSuperSample(4, 4);
 	cam.setShirley(true);
 	cam.setJitter(true);
@@ -210,6 +210,7 @@ void project3() {
 	BoxTreeObject tree;
 	tree.construct(dragon);
 	// Materials
+	LambertMaterial::seedRandomGenerator(1234567);
 	LambertMaterial white;
 	white.setColor(Color(0.7f, 0.7f, 0.7f));
 	LambertMaterial red;
@@ -241,11 +242,16 @@ void project3() {
 	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	cam.setFOV(40.0f);
 	cam.makeSuperSampler();
-	cam.setSuperSample(10, 10);
+	cam.setSuperSample(2, 2);
 	cam.setJitter(true);
 	cam.setShirley(true);
+
+	clock_t t;
+	t = clock();
 	// Render image
 	cam.render(scn);
+	t = clock() - t;
+	cout << " Scene rendered in " << ((float)t) / CLOCKS_PER_SEC << " seconds. " << endl;
 	cam.saveBitmap("project3.bmp");
 }
 void testProject()

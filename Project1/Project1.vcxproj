@@ -164,6 +164,7 @@
   <ItemGroup>
     <Image Include="project1.bmp" />
     <Image Include="project2.bmp" />
+    <Image Include="project3.bmp" />
     <Image Include="solution.bmp" />
     <Image Include="spheres.bmp" />
     <Image Include="testProject.bmp" />

@@ -14,6 +14,7 @@ public:
 	virtual void generateSample(const Intersection &isect, const glm::vec3 &inDir, glm::vec3 &outDir, Color &outColor) = 0;
 	Color diffuseColor;
 	void setColor(Color val);
+	bool isDielectric;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

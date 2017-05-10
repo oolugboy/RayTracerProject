@@ -161,7 +161,7 @@
 	 if (superSampler)
 	 {
 		//Temp
-		 rayTracer->rayTrace(ray, s, pixelColor);
+		 rayTracer->pathTrace(ray, s, pixelColor, 1);
 	 }
 	 else
 	 {
