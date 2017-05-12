@@ -242,7 +242,7 @@ void project3() {
 	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	cam.setFOV(40.0f);
 	cam.makeSuperSampler();
-	cam.setSuperSample(2, 2);
+	cam.setSuperSample(10, 10);
 	cam.setJitter(true);
 	cam.setShirley(true);
 

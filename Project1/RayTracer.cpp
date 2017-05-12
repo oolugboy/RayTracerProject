@@ -4,7 +4,7 @@
 
 RayTracer::RayTracer()
 {
-	maxNumSteps = 5;
+	maxNumSteps = 10;
 }
 void RayTracer::rayTrace(Ray & ray, Scene & s, Color & pixelColor)
 {
