@@ -40,5 +40,5 @@ void LambertMaterial::computeReflectance(Color &col, const glm::vec3 &in, const 
 	Color temp;
 	temp.scale(diffuseColor, 1.0f / pi);
 	col.multiply(temp);
-	col.scale(3.2f);
+	col.scale(pi);
 }

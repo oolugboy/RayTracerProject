@@ -22,12 +22,12 @@ void RayTracer::rayTrace(Ray & ray, Scene & s, Color & pixelColor)
 }
 void RayTracer::pathTrace(Ray & ray, Scene & s, Color & pixelColor, int step)
 {
-	if (step > maxNumSteps)
+	/*if(step > maxNumSteps)
 	{
 		return;
 	}
 	else
-	{
+	{ */
 		/* Got the first hit */
 		Intersection hit = Intersection();
 		bool collided = s.getClosestIntersect(ray, hit);
@@ -41,11 +41,11 @@ void RayTracer::pathTrace(Ray & ray, Scene & s, Color & pixelColor, int step)
 			}
 
 			/* now to get the reflected ray diretection */
-			glm::vec3 outDir;			
+			/*glm::vec3 outDir;			
 			hit.mtl->generateSample(hit, -1.0f * ray.direction, outDir, Color());
 
 			/* Then pathTrace the reflected ray */
-			Ray reflRay;
+		/*	Ray reflRay;
 			reflRay.origin = hit.position;
 			reflRay.direction = outDir;
 			Color reflColor = Color(0.0f, 0.0f, 0.0f);
@@ -53,13 +53,13 @@ void RayTracer::pathTrace(Ray & ray, Scene & s, Color & pixelColor, int step)
 			hit.mtl->computeReflectance(reflColor, reflRay.direction, -1.0f * ray.direction, hit);
 
 			/* Then add the reflected color*/
-			pixelColor.add(reflColor);
+			//pixelColor.add(reflColor);
 		}
 		else
 		{
 			pixelColor = s.getSkyColor();
 		}
-	}
+	//}
 }
 void RayTracer::getDirectLightPath(Ray & ray, Scene & s, Intersection & hit, Color & pixelColor, int step)
 {

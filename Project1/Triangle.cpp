@@ -34,9 +34,6 @@ bool Triangle::intersect(const Ray & ray, Intersection & hit) const
 
 	if (alpha > 0.0f && beta > 0.0f && (alpha + beta) < 1 && hit.dist > 0.001f)
 	{
-		if (ray.debug)
-			cout << " The hit dist is " << hit.dist << endl;
-
 		hit.normal = glm::normalize((1 - alpha - beta) * vertices[0]->normal + (alpha * vertices[1]->normal) + (beta * vertices[2]->normal));	
 		if (glm::dot(ray.direction, hit.normal) > 0)
 		{
@@ -44,6 +41,15 @@ bool Triangle::intersect(const Ray & ray, Intersection & hit) const
 		}
 		hit.mtl = this->mtl;
 		hit.position = ray.origin + (hit.dist * ray.direction);
+
+		/* Compute the tangent vectors */
+		hit.tangentU = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), hit.normal);
+		if (glm::length(hit.tangentU) < 0.001f)
+		{
+			hit.tangentU = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), hit.normal);
+		}
+		hit.tangentU = glm::normalize(hit.tangentU);
+		hit.tangentV = glm::cross(hit.normal, hit.tangentU);
 		return true;
 	}
 	else

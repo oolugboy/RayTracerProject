@@ -43,6 +43,7 @@
 			if (superSampler)
 			{
 				superSamplePixel(x, y, s);
+				//cout << " Done sampling pixel " << x << " " << y << endl;
 			}
 			else
 			{

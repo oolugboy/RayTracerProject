@@ -18,11 +18,13 @@
 #include "BoxTreeObject.h"
 #include "LambertMaterial.h"
 #include "MetalMaterial.h"
+#include "AshikhminMaterial.h"
 
 using namespace std;
 void project1();
 void project2();
 void project3();
+void project4();
 void spheres();
 void testProject();
 
@@ -34,7 +36,8 @@ int main(int argc,char **argv) {
 	//project2();
 	//spheres();
 	//testProject();
-	project3();
+	//project3();
+	project4();
 	return 0;
 }
 
@@ -199,7 +202,7 @@ void project3() {
 	scn.setSkyColor(Color(0.8f, 0.9f, 1.0f));
 	// Create ground
 	LambertMaterial groundMtl;
-	groundMtl.setColor(Color(0.25f, 0.25f, 0.25f));
+	groundMtl.setDiffuseColor(Color(0.25f, 0.25f, 0.25f));
 	MeshObject ground;
 	ground.makeBox(2.0f, 0.11f, 2.0f, &groundMtl);
 	scn.addObject(ground);
@@ -212,11 +215,11 @@ void project3() {
 	// Materials
 	LambertMaterial::seedRandomGenerator(1234567);
 	LambertMaterial white;
-	white.setColor(Color(0.7f, 0.7f, 0.7f));
+	white.setDiffuseColor(Color(0.7f, 0.7f, 0.7f));
 	LambertMaterial red;
-	red.setColor(Color(0.7f, 0.1f, 0.1f));
+	red.setDiffuseColor(Color(0.7f, 0.1f, 0.1f));
 	MetalMaterial metal;
-	metal.setColor(Color(0.95f, 0.64f, 0.54f));
+	metal.setDiffuseColor(Color(0.95f, 0.64f, 0.54f));
 	const int numDragons = 4;
 	Material *mtl[numDragons] = { &white,&metal,&red,&white };
 	// Create dragon instances
@@ -242,7 +245,7 @@ void project3() {
 	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	cam.setFOV(40.0f);
 	cam.makeSuperSampler();
-	cam.setSuperSample(10, 10);
+	cam.setSuperSample(20, 20);
 	cam.setJitter(true);
 	cam.setShirley(true);
 
@@ -253,6 +256,76 @@ void project3() {
 	t = clock() - t;
 	cout << " Scene rendered in " << ((float)t) / CLOCKS_PER_SEC << " seconds. " << endl;
 	cam.saveBitmap("project3.bmp");
+}
+void project4() {
+	// Create scene
+	Scene scn;
+	scn.setSkyColor(Color(0.8f, 0.9f, 1.0f));
+	// Materials
+	const int nummtls = 4;
+	AshikhminMaterial mtl[nummtls];
+	// Diffuse
+	mtl[0].setSpecularLevel(0.0f);
+	mtl[0].setDiffuseLevel(1.0f);
+	mtl[0].setDiffuseColor(Color(0.7f, 0.7f, 0.7f));
+	// Roughened copper
+	mtl[1].setDiffuseLevel(0.0f);
+	mtl[1].setSpecularLevel(1.0f);
+	mtl[1].setSpecularColor(Color(0.9f, 0.6f, 0.5f));
+	mtl[1].setRoughness(100.0f, 100.0f);
+	// Anisotropic gold
+	mtl[2].setDiffuseLevel(0.0f);
+	mtl[2].setSpecularLevel(1.0f);
+	mtl[2].setSpecularColor(Color(0.95f, 0.7f, 0.3f));
+	mtl[2].setRoughness(1.0f, 1000.0f);
+	// Red plastic
+	mtl[3].setDiffuseColor(Color(1.0f, 0.1f, 0.1f));
+	mtl[3].setDiffuseLevel(0.8f);
+	mtl[3].setSpecularLevel(0.2f);
+	mtl[3].setSpecularColor(Color(1.0f, 1.0f, 1.0f));
+	mtl[3].setRoughness(1000.0f, 1000.0f);
+	// Load dragon mesh
+	MeshObject dragon;
+	dragon.loadPLY("dragon.ply", 0);
+	// Create box tree
+	BoxTreeObject tree;
+	tree.construct(dragon);
+	// Create dragon instances
+	glm::mat4 mtx;
+	for (int i = 0; i<nummtls; i++) {
+		InstanceObject *inst = new InstanceObject();
+		inst->setChild(tree);
+		mtx[3] = glm::vec4(0.0f, 0.0f, -0.1f*float(i), 1.0f);
+		inst->setMatrix(mtx);
+		inst->setMaterial(&mtl[i]);
+		scn.addObject(*inst);
+	}
+	// Create ground
+	LambertMaterial lambert;
+	lambert.setDiffuseColor(Color(0.3f, 0.3f, 0.35f));
+	MeshObject ground;
+	ground.makeBox(2.0f, 0.11f, 2.0f, &lambert);
+	scn.addObject(ground);
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.setBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.setIntensity(1.0f);
+	sunlgt.setDirection(glm::vec3(2.0f, -3.0f, -2.0f));
+	scn.addLight(sunlgt);
+	// Create camera
+	Camera cam;
+	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, -0.15f), glm::vec3(0.0f, 1.0f, 0.0f));
+	cam.setFOV(40.0f);
+	cam.setAspect(1.33f);
+	cam.setResolution(800, 600);
+	cam.makeSuperSampler();
+	cam.setSuperSample(2, 2);
+	cam.setJitter(true);
+	cam.setShirley(true);
+	cout << " About to start the rendering " << endl;
+	// Render image
+	cam.render(scn);
+	cam.saveBitmap("project4.bmp");
 }
 void testProject()
 {

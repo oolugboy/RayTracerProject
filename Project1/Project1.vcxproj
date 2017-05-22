@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AshikhminMaterial.cpp" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="BoxTreeNode.cpp" />
     <ClCompile Include="BoxTreeObject.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AshikhminMaterial.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="BoxTreeNode.h" />
     <ClInclude Include="BoxTreeObject.h" />
@@ -165,6 +167,7 @@
     <Image Include="project1.bmp" />
     <Image Include="project2.bmp" />
     <Image Include="project3.bmp" />
+    <Image Include="project4.bmp" />
     <Image Include="solution.bmp" />
     <Image Include="spheres.bmp" />
     <Image Include="testProject.bmp" />
