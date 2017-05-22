@@ -264,6 +264,7 @@ void project4() {
 	// Materials
 	const int nummtls = 4;
 	AshikhminMaterial mtl[nummtls];
+	AshikhminMaterial::seedRandomGenerator(1234567);
 	// Diffuse
 	mtl[0].setSpecularLevel(0.0f);
 	mtl[0].setDiffuseLevel(1.0f);
@@ -283,7 +284,7 @@ void project4() {
 	mtl[3].setDiffuseLevel(0.8f);
 	mtl[3].setSpecularLevel(0.2f);
 	mtl[3].setSpecularColor(Color(1.0f, 1.0f, 1.0f));
-	mtl[3].setRoughness(1000.0f, 1000.0f);
+	mtl[3].setRoughness(1000.0f, 1000.0f); 
 	// Load dragon mesh
 	MeshObject dragon;
 	dragon.loadPLY("dragon.ply", 0);

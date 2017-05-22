@@ -3,6 +3,7 @@
 LambertMaterial::LambertMaterial()
 {
 	isDielectric = false;
+	
 }
 LambertMaterial::~LambertMaterial()
 {
