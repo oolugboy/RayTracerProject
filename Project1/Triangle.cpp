@@ -35,7 +35,7 @@ bool Triangle::intersect(const Ray & ray, Intersection & hit) const
 	if (alpha > 0.0f && beta > 0.0f && (alpha + beta) < 1 && hit.dist > 0.001f)
 	{
 		hit.normal = glm::normalize((1 - alpha - beta) * vertices[0]->normal + (alpha * vertices[1]->normal) + (beta * vertices[2]->normal));	
-		if (glm::dot(ray.direction, hit.normal) > 0)
+		if (glm::dot(ray.direction, hit.normal) > 0.0000001f)
 		{
 			hit.normal = hit.normal * -1.0f;
 		}

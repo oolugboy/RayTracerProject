@@ -41,7 +41,10 @@ bool InstanceObject::closestIntersect(const Ray & ray, Intersection & hit)
 
 	hit.position = glm::vec3(matrix * glm::vec4(hit.position, 1));
 	hit.normal = glm::normalize(glm::vec3(matrix * glm::vec4(hit.normal, 0)));
+	hit.tangentU = glm::normalize(glm::vec3(matrix * glm::vec4(hit.tangentU, 0.0f)));
+	hit.tangentV = glm::normalize(glm::vec3(matrix * glm::vec4(hit.tangentV, 0.0f)));
 	hit.dist = glm::distance(ray.origin, hit.position); // Correct for any scaling
+
 	if (this->mtl)
 	{
 		hit.mtl = this->mtl;

@@ -1,9 +1,12 @@
 #include "LambertMaterial.h"
+#include <iostream>
 
+using namespace std;
 LambertMaterial::LambertMaterial()
 {
 	isDielectric = false;
-	
+	debug = false;
+	step = 0;
 }
 LambertMaterial::~LambertMaterial()
 {
@@ -31,6 +34,7 @@ void LambertMaterial::generateSample(const Intersection &isect, const glm::vec3 
 	float v = sqrt(1 - t);
 
 	outDir = (v * cos(u) * xAxis) + (sqrt(t) * yAxis) + (v * sin(u) * zAxis);
+	outColor = Color(1.0f);
 }
 void LambertMaterial::seedRandomGenerator(int seed)
 {

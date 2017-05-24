@@ -17,6 +17,8 @@ public:
 	float diffuseLevel;
 	float specularLevel;
 	float nU, nV;
+	bool debug;
+	int step;
 	void setDiffuseLevel(float level);
 	void setSpecularLevel(float level);
 	void setRoughness(float roughU, float roughV);

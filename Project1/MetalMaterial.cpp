@@ -24,6 +24,7 @@ void MetalMaterial::generateSample(const Intersection &isect, const glm::vec3 &i
 {	
 	float nDotD = glm::dot(isect.normal, inDir);
 	outDir = (2.0f * (nDotD)* isect.normal) - inDir;
+	outColor = Color(1.0f);
 }
 MetalMaterial::~MetalMaterial()
 {

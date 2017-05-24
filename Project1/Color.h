@@ -9,6 +9,7 @@
 class Color {
 public:
 	Color()									{Red=Green=Blue=1.0;}
+	Color(float c)							{ Red = Green = Blue = c; }
 	Color(float r,float g,float b)			{Red=r; Green=g; Blue=b;}
 
 	void set(float r,float g,float b)		{Red=r; Green=g; Blue=b;}
