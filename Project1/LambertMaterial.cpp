@@ -4,6 +4,7 @@
 using namespace std;
 LambertMaterial::LambertMaterial()
 {
+	isLambertian = true;
 	isDielectric = false;
 	debug = false;
 	step = 0;
@@ -26,8 +27,8 @@ void LambertMaterial::generateSample(const Intersection &isect, const glm::vec3 
 	glm::vec3 xAxis = glm::vec3(1.0f, 0.0f, 0.0f), yAxis = glm::vec3(0.0f, 1.0f, 0.0f), zAxis = glm::vec3(0.0f, 0.0f, 1.0f);
 	orientAxis(xAxis, yAxis, zAxis, isect.normal);
 
-	float s = (float)(rand() % 10) / 9.0f;
-	float t = (float)(rand() % 10) / 9.0f;
+	float s = (float)rand() / RAND_MAX;
+	float t = (float)rand() / RAND_MAX;
 
 	float PI = 3.1415926f;
 	float u = 2 * PI * s;

@@ -5,7 +5,7 @@ using namespace std;
 float PI = 3.1415926f;
 AshikhminMaterial::AshikhminMaterial()
 {
-	isDielectric = false;
+	isLambertian = isDielectric = false;
 	nU = nV = 0.0f;
 	specularColor = Color(0.0f, 0.0f, 0.0f);
 	diffuseColor = Color(0.0f, 0.0f, 0.0f);
@@ -30,27 +30,19 @@ void AshikhminMaterial::generateSample(const Intersection &isect, const glm::vec
 
 	if (sample > specProb)
 	{
-		outColor = Color(1.0f - specProb);
+		outColor = diffuseColor;
+		outColor.scale(1.0f - specProb);
 		outDir = diffuseDir;
 	}
 	else
 	{
-		if (sample > (specDirProb * specProb))
-		{
-			outColor = Color(0.0f);
-		}
-		else
-		{
-			if (glm::dot(specularDir, isect.normal) > 0.0001f)
-			{
-				outColor = Color((1.0f / specDirProb) * specProb);
-			}
-		}
+		outColor = specularColor;
+		outColor.scale(specProb);	
 		outDir = specularDir;
 	}
-	if (glm::dot(outDir, isect.normal) < 0.0001f)
+	if (glm::dot(outDir, isect.normal) < 0.000f)
 	{
-		outColor = Color(0.0f);
+		outColor = Color(0.00000f);
 	}
 }
 float AshikhminMaterial::getPhi(float eps1)
@@ -133,7 +125,7 @@ glm::vec3 AshikhminMaterial::getCartesianVector(const Intersection isect, float 
 }
 float AshikhminMaterial::getSpecularReflectance(const Intersection &isect, const glm::vec3 &inDir, const glm::vec3 &outDir)
 {
-	float leftMostOp = sqrt((nU + 1.0f) * (nV + 1.0f)) / (8.0f * PI);
+	float leftMostOp = sqrt((nU + 1.0f) * (nV + 1.0f)) / (8.0f);
 
 	glm::vec3 h = glm::normalize(inDir + outDir);
 	float hDotU = glm::dot(h, isect.tangentU);
@@ -163,7 +155,7 @@ float AshikhminMaterial::getDiffuseReflectance(const Intersection & isect, const
 
 	float fourthOp = (1.0f - pow(1.0f - (glm::dot(isect.normal, outDir) / 2.0f), 5));
 
-	return ((28.0f * diffuseLevel) /(23.0f)) * (1.0f - specularLevel) * thirdOp * fourthOp;
+	return ((28.0f * diffuseLevel) / (23.0f)) * (1.0f - specularLevel) * thirdOp * fourthOp;
 }
 void AshikhminMaterial::computeReflectance(Color &col, const glm::vec3 &in, const glm::vec3 &out, const Intersection &hit)
 {

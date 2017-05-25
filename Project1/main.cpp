@@ -320,7 +320,7 @@ void project4() {
 	cam.setAspect(1.33f);
 	cam.setResolution(800, 600);
 	cam.makeSuperSampler();
-	cam.setSuperSample(10, 10);
+	cam.setSuperSample(2,2);
 	cam.setJitter(true);
 	cam.setShirley(true);
 	cout << " About to start the rendering " << endl;

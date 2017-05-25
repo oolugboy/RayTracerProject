@@ -25,6 +25,7 @@ public:
 	void setDiffuseColor(Color val);
 	void setSpecularColor(Color val);
 	bool isDielectric;
+	bool isLambertian;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

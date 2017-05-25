@@ -175,6 +175,9 @@
     <Image Include="project3.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="2Sampleproject4.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
     <Image Include="project4.bmp">
       <Filter>Resource Files</Filter>
     </Image>
