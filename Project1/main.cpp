@@ -19,6 +19,7 @@
 #include "LambertMaterial.h"
 #include "MetalMaterial.h"
 #include "AshikhminMaterial.h"
+#include "PureFresnelMaterial.h"
 
 using namespace std;
 void project1();
@@ -27,6 +28,7 @@ void project3();
 void project4();
 void spheres();
 void testProject();
+void finalProject();
 
 #define PI 3.1415927
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,8 +38,9 @@ int main(int argc,char **argv) {
 	//project2();
 	//spheres();
 	//testProject();
-	//project3();
-	project4();
+	project3();
+	//project4();
+	//finalProject();
 	return 0;
 }
 
@@ -77,6 +80,7 @@ void spheres() {
 	cout << " about to save the spheres image " << endl;
 	cam.saveBitmap("spheres.bmp");
 }
+
 
 
 void project1() {
@@ -196,6 +200,64 @@ void project2() {
 	cam.render(scn);
 	cam.saveBitmap("project2.bmp");
 }
+void finalProject()
+{
+	Scene scn;
+	scn.setSkyColor(Color(0.8f, 0.9f, 1.0f));
+
+	/* Details of the left wall */
+	LambertMaterial groundMtl;
+	groundMtl.setDiffuseColor(Color(0.25f, 0.25f, 0.25f));
+
+	MeshObject ground;
+	ground.makeBox(2.0f, 0.11f, 2.0f, &groundMtl);
+	scn.addObject(ground);
+
+	/**  The dragon **/ 
+	// Load dragon mesh
+	MeshObject dragon;
+	dragon.loadPLY("dragon.ply", 0);
+	// Create box tree
+	BoxTreeObject tree;
+	tree.construct(dragon);
+
+	PureFresnelMaterial glass;
+	glass.setRefractiveIndex(1.8f);
+	glass.setDiffuseColor(Color(0.941f, 0.902f, 0.549f));
+	PureFresnelMaterial::seedRandomGenerator(1234567);
+
+	InstanceObject * inst = new InstanceObject();
+	inst->setChild(tree);
+	glm::mat4 mtx;
+	mtx[3] = glm::vec4(0.0f, 0.0f, 0.05f, 1.0f);
+	mtx = mtx * glm::rotate(glm::mat4(1.0f), 5.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	inst->setMatrix(mtx);
+	inst->setMaterial(&(glass));
+	scn.addObject(*inst);
+
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.setBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.setIntensity(0.5f);
+	sunlgt.setDirection(glm::vec3(-0.5f, -1.0f, -0.5f));
+	scn.addLight(sunlgt);
+
+	// Create camera
+	Camera cam;
+	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	cam.setResolution(800, 600);
+	cam.setFOV(40.0f);
+	cam.setAspect(1.33f);
+	cam.makeSuperSampler();
+	cam.setSuperSample(10, 10);
+	cam.setShirley(true);
+	cam.setJitter(true);
+	cam.setBlurred(false);
+
+	// Render image
+	cam.render(scn);
+	cam.saveBitmap("finalProject.bmp");
+}
 void project3() {
 	// Create scene
 	Scene scn;
@@ -209,22 +271,47 @@ void project3() {
 	// Load dragon mesh
 	MeshObject dragon;
 	dragon.loadPLY("dragon.ply", 0);
+
+	
+
 	// Create box tree
 	BoxTreeObject tree;
 	tree.construct(dragon);
 	// Materials
-	LambertMaterial::seedRandomGenerator(1234567);
+	Material::seedRandomGenerator(1234567);
 	LambertMaterial white;
 	white.setDiffuseColor(Color(0.7f, 0.7f, 0.7f));
+
 	LambertMaterial red;
 	red.setDiffuseColor(Color(0.7f, 0.1f, 0.1f));
+
+	PureFresnelMaterial clearGlass;
+	clearGlass.setRefractiveIndex(1.8f);
+	clearGlass.setDiffuseColor(Color(1.0f, 0.0f, 0.0f));
+
+	PureFresnelMaterial diamond;
+	diamond.setRefractiveIndex(2.42f);
+	diamond.setDiffuseColor(Color(1.0f, 1.0f, 1.0f));
+
 	MetalMaterial metal;
 	metal.setDiffuseColor(Color(0.95f, 0.64f, 0.54f));
+
+	MeshObject cube;
+	cube.makeBox(0.1f, 0.1f, 0.1f);
+	InstanceObject * inst = new InstanceObject();
+	inst->setChild(cube);
+	glm::mat4 cubeMat;
+	cubeMat[3] = glm::vec4(0.0f, 0.1f, -0.15f, 1.0f);
+	inst->setMatrix(cubeMat);
+	inst->setMaterial(&clearGlass);
+	scn.addObject(*inst);
+
+
 	const int numDragons = 4;
-	Material *mtl[numDragons] = { &white,&metal,&red,&white };
+	Material *mtl[numDragons] = { &clearGlass,&red,&red,&diamond };
 	// Create dragon instances
 	glm::mat4 mtx;
-	for (int i = 0; i<numDragons; i++) {
+	for (int i = 1; i<numDragons; i++) {
 		InstanceObject * inst = new InstanceObject();
 		inst->setChild(tree);
 		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
@@ -245,9 +332,10 @@ void project3() {
 	cam.lookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	cam.setFOV(40.0f);
 	cam.makeSuperSampler();
-	cam.setSuperSample(2, 2);
+	cam.setSuperSample(10, 10);
 	cam.setJitter(true);
 	cam.setShirley(true);
+	cam.setBlurred(true);
 
 	clock_t t;
 	t = clock();
@@ -320,7 +408,7 @@ void project4() {
 	cam.setAspect(1.33f);
 	cam.setResolution(800, 600);
 	cam.makeSuperSampler();
-	cam.setSuperSample(2,2);
+	cam.setSuperSample(5, 5);
 	cam.setJitter(true);
 	cam.setShirley(true);
 	cout << " About to start the rendering " << endl;

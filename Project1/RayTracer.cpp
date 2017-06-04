@@ -40,8 +40,8 @@ void RayTracer::pathTrace(Ray & ray, Scene & s, Color & pixelColor, int step)
 
 			/* now to get the reflected ray diretection */
 			glm::vec3 outDir;	
-			Color inateReflColor = Color(0.0f);
-			hit.mtl->generateSample(hit, -1.0f * ray.direction, outDir, inateReflColor);
+			Color reflectanceColor = Color(0.0f);
+			hit.mtl->generateSample(hit, -1.0f * ray.direction, outDir, reflectanceColor);
 
 			/* Then pathTrace the reflected ray */
 			Ray reflRay;
@@ -50,14 +50,8 @@ void RayTracer::pathTrace(Ray & ray, Scene & s, Color & pixelColor, int step)
 				
 			Color reflColor = Color(0.0f, 0.0f, 0.0f);
 			pathTrace(reflRay, s, reflColor, step + 1);
-			if (hit.mtl->isLambertian)
-			{
-				hit.mtl->computeReflectance(reflColor, reflRay.direction, -1.0f * ray.direction, hit);
-			}
-			else
-			{
-				reflColor.multiply(inateReflColor);
-			}
+		
+			reflColor.multiply(reflectanceColor);		
 
 			/* Then add the reflected color*/
 			pixelColor.add(reflColor);

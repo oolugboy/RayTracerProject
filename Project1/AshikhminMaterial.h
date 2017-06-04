@@ -16,6 +16,5 @@ public:
 	float getSpecularProbability(glm::vec3 normal, glm::vec3 h, float phi);
 	float getPhi(float eps1);
 	float getTheta(float eps2, float phi);
-	static void seedRandomGenerator(int seed);
 };
 

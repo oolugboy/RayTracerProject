@@ -4,7 +4,7 @@
 using namespace std;
 LambertMaterial::LambertMaterial()
 {
-	isLambertian = true;
+	isAshikhmin = false;
 	isDielectric = false;
 	debug = false;
 	step = 0;
@@ -35,11 +35,7 @@ void LambertMaterial::generateSample(const Intersection &isect, const glm::vec3 
 	float v = sqrt(1 - t);
 
 	outDir = (v * cos(u) * xAxis) + (sqrt(t) * yAxis) + (v * sin(u) * zAxis);
-	outColor = Color(1.0f);
-}
-void LambertMaterial::seedRandomGenerator(int seed)
-{
-	srand(seed);
+	outColor = Color(diffuseColor);
 }
 void LambertMaterial::computeReflectance(Color &col, const glm::vec3 &in, const glm::vec3 &out, const Intersection &hit) {
 	float pi = 3.1415926f;

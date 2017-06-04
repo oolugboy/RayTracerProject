@@ -5,7 +5,8 @@ using namespace std;
 float PI = 3.1415926f;
 AshikhminMaterial::AshikhminMaterial()
 {
-	isLambertian = isDielectric = false;
+	isDielectric = false;
+	isAshikhmin = true;
 	nU = nV = 0.0f;
 	specularColor = Color(0.0f, 0.0f, 0.0f);
 	diffuseColor = Color(0.0f, 0.0f, 0.0f);
@@ -110,10 +111,6 @@ void AshikhminMaterial::generateDiffuseSample(const Intersection isect, const gl
 	float v = sqrt(1 - t);
 
 	outDir = glm::normalize((v * cos(u) * isect.tangentU) + (sqrt(t) * isect.normal) + (v * sin(u) * isect.tangentV));
-}
-void AshikhminMaterial::seedRandomGenerator(int seed)
-{
-	srand(seed);
 }
 glm::vec3 AshikhminMaterial::getCartesianVector(const Intersection isect, float theta, float phi)
 {

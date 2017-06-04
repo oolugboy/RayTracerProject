@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Intersection.h"
 #include "Material.h"
+#include <glm/gtx/matrix_interpolation.hpp>
 
  Camera::Camera()
  {
@@ -18,6 +19,10 @@
  {
 	 aspect = a;
  }
+ void Camera::setBlurred(bool blurred)
+ {
+	 this->blurred = blurred;
+ }
  void Camera::setResolution(int x, int y)
  {
 	 xRes = x;
@@ -32,7 +37,12 @@
 	 glm::vec3 a = glm::normalize(glm::cross(up, c));
 	 glm::vec3 b = glm::cross(c, a);
 
-	 worldMatrix = glm::mat4(a.x, a.y, a.z, 0, b.x, b.y, b.z, 0, c.x, c.y, c.z, 0, d.x, d.y, d.z, 1);
+	 initWorldMatrix = glm::mat4(a.x, a.y, a.z, 0, b.x, b.y, b.z, 0, c.x, c.y, c.z, 0, d.x, d.y, d.z, 1);
+
+	 glm::vec3 fd = pos + (glm::normalize(target - pos) * 0.1f);
+
+	 finalWorldMatrix = glm::mat4(a.x, a.y, a.z, 0, b.x, b.y, b.z, 0, c.x, c.y, c.z, 0, fd.x, fd.y, fd.z, 1);
+
  }
  void Camera::render(Scene & s)
  {
@@ -142,32 +152,53 @@
  }
  void Camera::shootAtPixelOffset(float fx, float fy, Scene & s, Color & pixelColor)
  {
+	 float r = fmax(fy, fx);
+	 
 	 float PI = 3.14159265;
 	 float radVFOV = (verticalFOV * PI) / 180.0f;
 	 float radHFOV = 2.0f * atan(aspect * tan(radVFOV / 2.0f));
+
+	 float t = (float)rand() / (float)RAND_MAX;
+
+	 if (blurred)
+		worldMatrix = glm::interpolate(initWorldMatrix, finalWorldMatrix, t);
+	 else
+		worldMatrix = initWorldMatrix;
 
 	 glm::vec3 a = glm::vec3(worldMatrix[0]);
 	 glm::vec3 b = glm::vec3(worldMatrix[1]);
 	 glm::vec3 c = glm::vec3(worldMatrix[2]);
 	 glm::vec3 d = glm::vec3(worldMatrix[3]);
 
-	 float scaleX = 2.0f * tan(radHFOV / 2.0f);
-	 float scaleY = 2.0f * tan(radVFOV / 2.0f);
+	 float scaleX = 2.0f * tan(radHFOV / 2.0f);// *cos((fabs(fx) / 0.5f) * (PI / 2.0f));
+
+	 float scaleY = 2.0f * tan(radVFOV / 2.0f);// *cos((fabs(fy) / 0.5f) * (PI / 2.0f));
+
+	 float fz = 0.0f;
+
+	 if (sqrt(pow(fx, 2) + pow(fy, 2)) <= 0.5f)
+	 {
+		 fz = 0.5f - sqrt(pow(fx, 2) + pow(fy, 2));
+	 }
 
 	 /* Now to get the color of the pixel */
-	 Ray ray;
-	 ray.origin = d;
-	 ray.direction = glm::normalize((fx * scaleX * a) + (fy * scaleY * b) - c);
+	 if (fz > 0.00000f)
+	 {
+		 Ray ray;
+		 ray.origin = d;
+		 //ray.direction = glm::normalize((fx * scaleX * a) + (fy * scaleY * b) - c);
+		 ray.direction = glm::normalize((((fx * scaleX) / (fz * 2.0f)) * a) + (((fy  * scaleY) / (fz * 2.0f)) * b) - (c));
 
-	 if (superSampler)
-	 {
-		//Temp
-		 rayTracer->pathTrace(ray, s, pixelColor, 1);
+		 if (superSampler)
+		 {
+			 //Temp
+			 rayTracer->pathTrace(ray, s, pixelColor, 1);
+		 }
+		 else
+		 {
+			 rayTracer->rayTrace(ray, s, pixelColor);
+		 }
 	 }
-	 else
-	 {
-		 rayTracer->rayTrace(ray, s, pixelColor);
-	 }	
  }
  void Camera::saveBitmap(char * filename)
  {

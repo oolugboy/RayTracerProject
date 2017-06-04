@@ -75,6 +75,9 @@
     <ClCompile Include="AshikhminMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PureFresnelMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Material.h">
@@ -152,6 +155,9 @@
     <ClInclude Include="AshikhminMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PureFresnelMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -179,6 +185,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="project4.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="finalProject.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

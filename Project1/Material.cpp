@@ -16,6 +16,10 @@ void Material::setSpecularLevel(float level)
 {
 	this->specularLevel = level;
 }
+void Material::seedRandomGenerator(float seed)
+{
+	srand(seed);
+}
 void Material::setRoughness(float roughU, float roughV)
 {
 	this->nU = roughU;

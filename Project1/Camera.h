@@ -33,13 +33,14 @@ public:
 	void superSamplePixel(int x, int y, Scene & s);
 	void applyShirley(float & xRand, float & yRand);
 	void makeSuperSampler();
+	void setBlurred(bool blurred);
 	void printVector(glm::vec3 val)
 	{
 		cout << val.x << " " << val.y << " " << val.z << endl;
 	}
 private:
 	int xRes, yRes;
-	glm::mat4x4 worldMatrix;
+	glm::mat4x4 initWorldMatrix, finalWorldMatrix, worldMatrix;
 	float verticalFOV;
 	float aspect;
 	float xSamples, ySamples;
@@ -47,4 +48,5 @@ private:
 	bool jitter, shirley;
 	Bitmap * bMP;
 	RayTracer * rayTracer;
+	bool blurred;
 };
